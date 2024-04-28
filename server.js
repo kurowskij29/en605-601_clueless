@@ -103,6 +103,7 @@ io.on('connection', (socket) => {
 
       function handleMove(act) {
          // Create message start
+         console.log("HEHRUEHRWEUF");
          let msg = data.activePlayer.character + '(' + data.activePlayer.name + ') moved from ';
 
          // Create descriptive message of first room for text based

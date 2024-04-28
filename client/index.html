@@ -5,31 +5,103 @@
       <!-- this is the CSS section  -->
       <style>
          body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
+         .main-board{ display:flex;}
          #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
          #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
          #input:focus { outline: none; }
          #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 
+         h2, h5 { text-align: center; width: 100%; margin-top: 0; padding-top: 10px;}
 
          /* formatting for start button */
          #start { position: fixed; bottom: 6.5rem; left: 0; right: 0;background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
 
          #nameform { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 3.25rem; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
          #nameIn { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
          #nameIn:focus { outline: none; }
          #nameform > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 
-         #messages { list-style-type: none; margin: 0; padding: 0; }
+         #messages { list-style-type: none; margin: 0; padding: 0; width: 50%;}
          #messages > li { padding: 0.5rem 1rem; }
          #messages > li:nth-child(odd) { background: #efefef; }
+         .messsages-container{ margin: 0; padding: 0; width: 50%; height: 100%; background:rgba(235, 235, 235, 0.15)}
+
+         .movement-buttons {display: grid; grid-template-columns: auto auto auto; grid-template-rows: auto auto auto; gap: 10px; justify-items: center; align-items: center;}
+         .button { border: 1px solid #000; padding: 10px; cursor: pointer; background-color: #228B22; color: white; font-weight: bold; text-align: center;}
+         .button.up { grid-column: 2; grid-row: 1; }
+         .button.left { grid-column: 1; grid-row: 2; }
+         .button.right { grid-column: 3; grid-row: 2; }
+         .button.down { grid-column: 2; grid-row: 3; }
+
+         .game-board-controllers {display: flex; flex-direction: row; align-items: center; justify-content: space-around; padding: 10px; gap: 50px; background-color: #ebebeb; }
+         .game-board {display: grid; grid-template-columns: repeat(5, auto); grid-template-rows: repeat(3, auto); gap: 5px; justify-content: center;align-items: center;margin: 20px;padding: 10px;border: 3px solid #333; background-color: #ddd; }
+
+         .room {width: 80px; height: 80px;background-color: #fff; border: 1px solid #000;display: flex;justify-content: center; align-items: center;text-align: center;font-size: smaller;}
+
+         .hallway {width: 80px; height: 80px;background-color: #bbb; border: 1px solid #888; display: flex;justify-content: center;align-items: center;text-align: center;}
+
          /* end css section  */
       </style>
+       
    </head>
    <body>
    <!-- html section  -->
-   <ul id="messages"></ul>
+   <h2>Clue-Less</h2>
+   <div class="main-board">
+      <div class="messsages-container">
+         <h5>Messages</h5>
+         <ul id="messages"></ul>
+      </div>
+      <div class="game-board">
+         <div class="room" id="room1">Reception</div>
+         <div class="hallway" id="hallway1"></div>
+         <div class="room" id="room2">Conference Room</div>
+         <div class="hallway" id="hallway2"></div>
+         <div class="room" id="room3">Break Room</div>
+   
+         
+         <div class="hallway" id="hallway3"></div>
+         <div class="blank" id="blank1"></div>
+         <div class="hallway" id="hallway4"></div>
+         <div class="blank" id="blank2"></div>
+         <div class="hallway" id="hallway5"></div>
+   
+         <div class="room" id="room4">Annex</div>
+         <div class="hallway" id="hallway6"></div>
+         <div class="room" id="room5">Accounting</div>
+         <div class="hallway" id="hallway7"></div>
+         <div class="room" id="room6">Parking Lot</div>
+   
+   
+         <div class="hallway" id="hallway8"></div>
+         <div class="blank" id="blank3"></div>
+         <div class="hallway" id="hallway9"></div>
+         <div class="blank" id="blank4"></div>
+         <div class="hallway" id="hallway10"></div>
+   
+   
+         <div class="room" id="room7">Warehouse</div>
+         <div class="hallway" id="hallway11"></div>
+         <div class="room" id="room8">Kitchen</div>
+         <div class="hallway" id="hallway12"></div>
+         <div class="room" id="room9">Michael's Office</div>
+      </div>
+   </div>
+
+   <div class="game-board-controllers">
+      <div class="movement-buttons">
+         <button class="button up">↑</button>
+         <button class="button left">←</button>
+         <button class="button right">→</button>
+         <button class="button down">↓</button>
+      </div>
+         <div class="actions-buttons">
+         <button class="button suggest">Suggestion</button>
+         <button class="button accuse">Accusation</button>
+      </div>  
+   </div>
+   
+   
    <!-- <img src="photo_server.jpg"></img> -->
    <form id="form" action="">
       <input id="input" autocomplete="off" /><button id="chatbutton" disabled>Send</button>
@@ -43,6 +115,5 @@
    <script src="/socket.io/socket.io.js"></script>
    
    <script type="module" src="/client.js"></script>
-
   </body>
 </html>
