@@ -35,7 +35,7 @@ class Room{
       } // end addWeapon
 
       isfull() {
-         if (this.occupants.length > this.occupancy) {
+         if (this.occupants.size >= this.occupancy) {
             return true;
          }
          else {

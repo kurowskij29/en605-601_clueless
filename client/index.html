@@ -144,14 +144,20 @@
             <h2 style="color: green;">Popup Form</h2> 
             <form class="form-container"
                   id="showForm"> 
-                <label class="form-label" 
+
+
+               <select name="showSel" id="showSel">
+                  <option value="" selected="selected">Select card to show</option>
+               </select>
+
+                <!-- <label class="form-label" 
                      id="showLabel"
                        for="card2show">   
                   Card To Show: 
                   </label> 
                 <input class="form-input" type="text" 
                        placeholder="Enter a card" 
-                       id="card2show" name="card2show" required> 
+                       id="card2show" name="card2show" required>  -->
                   
                 <button class="btn-submit" 
                         id="subShowCard"
@@ -173,6 +179,10 @@
             </select>
             <select name="weaponSel" id="weaponSel">
                <option value="" selected="selected">Select weapon</option>
+            </select>
+            
+            <select name="roomSel" id="roomSel" display="none">
+               <option value="" selected="selected">Select room</option>
             </select>
 
             <button class="btn-submit" 

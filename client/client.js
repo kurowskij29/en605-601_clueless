@@ -37,6 +37,17 @@ for (let i=0; i < allCards.weapons.length; i++) {
 }
 
 
+var roomSel = document.getElementById("roomSel");
+for (let i=0; i < allCards.rooms.length; i++) {
+   roomSel.options[roomSel.options.length] = new Option(allCards.rooms[i], allCards.rooms[i]);
+}
+roomSel.style.display = "none";
+
+
+
+var showSel = document.getElementById("showSel");
+
+
  // !!!!!!!!!!!!!!!!!!
  // START input
  // !!!!!!!!!!!!!!!!!!
@@ -105,42 +116,66 @@ for (let i=0; i < allCards.weapons.length; i++) {
 var subShow = document.getElementById("showForm")
 subShow.addEventListener('submit', function(e) {
    e.preventDefault();
-   let showSelectn = document.getElementById('card2show');
-   if (showSelectn.value) {
-      socket.emit('showCard', showSelectn.value);
-      showSelectn.value = '';
+   // let showSelectn = document.getElementById('card2show');
+   if (showSel.value) {
+      socket.emit('showCard', showSel.value);
+      // showSelectn.value = '';
+      var i, L = showSel.options.length - 1;
+      for(i = L; i >= 0; i--) {
+         showSel.remove(i);
+      }
       togglePopup();
    }
 });
 
 
-// //suggestion button
+// suggestion button
 var sugForm = document.getElementById('sugForm')
 var suggestionButton = document.getElementById('suggestion')
 suggestionButton.addEventListener('click', function() {   
    toggleSuggestForm();
 });
+// //accusation button
+var accusationButton = document.getElementById('accusation')
+accusationButton.addEventListener('click', function() {  
+   roomSel.style.display = "block"; 
+   toggleSuggestForm();
+});
 
-
-//suggestion button
+// suggestion/accusation form
 sugForm.addEventListener('submit', function(e) {
    e.preventDefault();
-   if (suspectSel.value && weaponSel.value) {
-      let data = {};
-      data.suspect = suspectSel.value;
-      data.weapon = weaponSel.value;
-      socket.emit('makeSuggestion', data);
-      toggleSuggestForm();
+   if (roomSel.style.display == "none") {
+      if (suspectSel.value && weaponSel.value) {
+         let data = {};
+         data.suspect = suspectSel.value;
+         data.weapon = weaponSel.value;
+         socket.emit('makeSuggestion', data);
+         toggleSuggestForm();
+      }
+   }
+   else {
+      if (suspectSel.value && weaponSel.value && roomSel.value) {
+         let data = {};
+         data.suspect = suspectSel.value;
+         data.weapon = weaponSel.value;
+         data.room = roomSel.value;
+         socket.emit('makeAccusation', data);
+         roomSel.style.display = "none";
+         toggleSuggestForm();
+      }
    }
 });
 
 
 
-//accusation button
-var accusationButton = document.getElementById("accusation")
-accusationButton.addEventListener("click", function () {
-   socket.emit('makeAccusation');
-});
+
+// //accusation form
+// sugForm.addEventListener('submit', function(e) {
+//    e.preventDefault();
+   
+// });
+
 
 //end button (end turn)
 var endButton = document.getElementById("endbutton")
@@ -186,26 +221,35 @@ passageButton.addEventListener("click" , function() {
 
 
  // endTurn to turn off buttons
- socket.on('endTurn', function() {         
-    document.getElementById("chatbutton").disabled = true;
- });
+socket.on('endTurn', function() {         
+   // document.getElementById("chatbutton").disabled = true;
+   deactivateButtons(allButtons);
+});
 
  // startTurn to turn on buttons
- socket.on('startTurn', function() {  
-   let actbut =    document.getElementById("chatbutton");    
-   actbut.disabled = false;
+ socket.on('startTurn', function(buttonList) {  
+   // let actbut =    document.getElementById("chatbutton");    
+   // actbut.disabled = false;
+   let buttonObj = [];
+   for (let ib = 0; ib < buttonList.length; ib++){
+      buttonObj.push(buttonDict[buttonList[ib]]);
+   }
+   activateButtons(buttonObj);
  });
 
  socket.on('poke', (opts) => {
-   let showLabel = document.getElementById('showLabel');
-   let newLab = "Choose one of the following to show:"
-   for (let i = 0; i < opts.length; i++) {
-      newLab = newLab + " " + opts[i].name;
-      if (i < opts.length - 1) {
-         newLab = newLab + ","
-      }
+   for (let i=0; i < opts.length; i++) {
+      showSel.options[showSel.options.length] = new Option(opts[i].name, opts[i].name);
    }
-   showLabel.innerHTML = newLab;
+   // let showLabel = document.getElementById('showLabel');
+   // let newLab = "Choose one of the following to show:"
+   // for (let i = 0; i < opts.length; i++) {
+   //    newLab = newLab + " " + opts[i].name;
+   //    if (i < opts.length - 1) {
+   //       newLab = newLab + ","
+   //    }
+   // }
+   // showLabel.innerHTML = newLab;
    togglePopup();
  });
 
@@ -218,8 +262,50 @@ socket.on('seeCard', (card) => {
     window.scrollTo(0, document.body.scrollHeight);
 })
  
- // end javascript section
+socket.on('endGame', (player, acc) => {
+   let msg = 'The murder was ' + acc.suspect + ' with the ' + acc.weapon + ' in the ' + acc.room + '!!!';
 
+   // replace toggle all buttons off
+
+   // replace this with a popup
+   var item = document.createElement('li');
+   item.textContent = msg;
+   messages.appendChild(item);
+   window.scrollTo(0, document.body.scrollHeight);
+
+});
+
+socket.on('postMove', (roomName) => {
+   if (roomName == 'hallway') {
+      deactivateButtons([suggestionButton])
+   }
+   else {
+      activateButtons([suggestionButton]);
+   }
+   deactivateButtons( [upButton, downButton, leftButton, rightButton, passageButton])
+});
+
+socket.on('postSugg', () => {
+   deactivateButtons([suggestionButton]);
+});
+
+var allButtons = [suggestionButton, accusationButton, endButton, upButton, endButton, downButton, leftButton, rightButton, passageButton];
+var buttonDict = {
+   "suggestion":suggestionButton, 
+   "accusation":accusationButton,
+   "up":upButton,
+   "down":downButton,
+   "left":leftButton,
+   "right":rightButton,
+   "passage":passageButton,
+   "endTurn":endButton
+};
+deactivateButtons(allButtons);
+
+
+// ###################
+// # START FUNCTIONS #
+// ###################
 function togglePopup() { 
    const overlay = document.getElementById('popupOverlay'); 
    // overlay.classList.toggle('show');
@@ -238,3 +324,19 @@ function toggleSuggestForm() {
       suggestPopup.style.display = "block";
     } 
 } 
+
+function deactivateButtons(buttonList) {
+   for (let ib = 0; ib < buttonList.length; ib++){
+      buttonList[ib].disabled = true;
+      buttonList[ib].style.backgroundColor =  "#ff0000"; 
+   }
+
+}
+
+function activateButtons(buttonList) {
+   for (let ib = 0; ib < buttonList.length; ib++){
+      buttonList[ib].disabled = false;
+      buttonList[ib].style.backgroundColor =  "#228B22"; 
+   }
+
+}
