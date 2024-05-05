@@ -28,14 +28,14 @@ function init(users) {
    // Initialize rooms
    var rooms = [
       new Room.Room('Reception', 'images/card_reception.png'),
-      new Room.Room('Conference Room', 'images/card_conference.png'),
-      new Room.Room('Break Room', 'images/card_break.png'),
+      new Room.Room('ConferenceRoom', 'images/card_conference.png'),
+      new Room.Room('BreakRoom', 'images/card_break.png'),
       new Room.Room('Annex', 'images/card_annex.png'),
       new Room.Room('Accounting', 'images/card_accounting.png'),
-      new Room.Room('Parking lot', 'images/card_parking.png'),
+      new Room.Room('ParkingLot', 'images/card_parking.png'),
       new Room.Room('Warehouse', 'images/card_warehouse.png'),
       new Room.Room('Kitchen', 'images/card_kitchen.png'),
-      new Room.Room('Michaels Office', 'images/card_office.png'),
+      new Room.Room('MichaelsOffice', 'images/card_office.png'),
    ]
 
    roomLinks(rooms);
@@ -61,15 +61,19 @@ function init(users) {
       new Card.Card('character', 'Andy', 'images/card_andy.png')
    ]);
 
+   character_cards.shuffle();
+
    // six weapons
    var weapon_cards = new Deck.Deck([
-      new Card.Card('weapon', 'Dundie Trophy', 'images/card_trophy.png'),
-      new Card.Card('weapon', 'Poisoned Pretzel', 'images/card_pretzel.png'),
-      new Card.Card('weapon', 'Coffee Mug', 'images/card_mug.png'),
-      new Card.Card('weapon', 'Bacon Grill', 'images/card_grill.png'),
-      new Card.Card('weapon', 'Dunder Mifflin Paper', 'images/card_paper.png'),
-      new Card.Card('weapon', 'Rabid Bat', 'images/card_bat.png')
+      new Card.Card('weapon', 'DundieTrophy', 'images/card_trophy.png'),
+      new Card.Card('weapon', 'PoisonedPretzel', 'images/card_pretzel.png'),
+      new Card.Card('weapon', 'CoffeeMug', 'images/card_mug.png'),
+      new Card.Card('weapon', 'BaconGrill', 'images/card_grill.png'),
+      new Card.Card('weapon', 'DunderMifflinPaper', 'images/card_paper.png'),
+      new Card.Card('weapon', 'RabidBat', 'images/card_bat.png')
    ]);
+
+   weapon_cards.shuffle();
 
    // nine rooms
    var room_cards = [];
@@ -78,6 +82,7 @@ function init(users) {
    }
 
    room_cards = new Deck.Deck(room_cards);
+   room_cards.shuffle();
 
 
    secretFolder = pickCrime(character_cards, weapon_cards, room_cards);
@@ -131,7 +136,7 @@ function init(users) {
 }
 
 
-function makeSuggestion(player, suspect, weapon, accusation = false, room = player.room) {
+function makeSuggestion(player, suspect, weapon, accusation = false, room = player.room.name) {
    // if (!accusation && room != player.room) {
    //    error("")
    // }
@@ -160,12 +165,13 @@ function checkAccusation(accusation, secret) {
 } // checkAccusation
 
 
-function pollSuggestion(activePlayer, suggestion) {
+function pollSuggestion(activePlayer, suggestion, nPlayer) {
    let match = false;
 
-   let hotSeat = activePlayer.next(); 
+   let hotSeat = activePlayer.next; 
    let cardMatches= [];
-   while (!match) {
+   let iCheck = 0;
+   while (!match && iCheck < nPlayer-1) {
       cardMatches = hotSeat.checkPoll(suggestion);
 
       if (cardMatches.length > 0) {
@@ -178,6 +184,9 @@ function pollSuggestion(activePlayer, suggestion) {
          match = true;
       }
    } // end while
+   if (!match) {
+      hotSeat = null;
+   }
 
    return hotSeat;
 } // end pollSuggestion

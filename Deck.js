@@ -1,10 +1,11 @@
 
 
-function Deck(cards) {
-   return {
-      count : 0,
-      allCards : cards,
-      stack : [],
+class Deck {
+   constructor(cards) {
+      this.count = 0;
+      this.allCards = cards;
+      this.stack = [];
+   };
 
       shuffle() {
          let pick = -1;
@@ -18,16 +19,17 @@ function Deck(cards) {
             max = this.allCards.length - 1;
             this.count++;
          }
-      },
+      }
 
 
       dealAll(nPlayer) {
-         hands = [];
+         let hands = [];
          for (let ip = 0; ip < nPlayer; ip++) {
             hands[ip] = [];
          }
 
-         ip = 0
+         let ip = 0
+         let pick;
          while (this.count > 0) {
             if (ip >= nPlayer){
                ip = 0;
@@ -42,28 +44,31 @@ function Deck(cards) {
          }
 
          return hands;
-      }, // end dealAll
+      } // end dealAll
 
 
       dealOne() {
-         pick = this.stack.pop();
+         let pick = this.stack.pop();
          this.count--;
          return pick
-      }, // end dealOne
+      } // end dealOne
 
 
-      
-
-   } // end return for factory 
 
 
-} // End room factory
+
+
+
+
+
+}
+
 
 function mergeDecks(deckArray){
    let newArray = deckArray[0].stack;
 
    for (let id = 1; id < deckArray.length; id++) {
-      newArray.concat(deckArray[id].stack);
+      newArray = newArray.concat(deckArray[id].stack);
    }
 
    let newDeck = new Deck(newArray);

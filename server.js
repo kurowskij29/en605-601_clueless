@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
       username = name;
       let iu = getUserIndex(socket.id);
       users[iu]['name'] = username;
-      io.emit('usernameSet', username + ' joined the chat!!!');
+      io.emit('chat message', username + ' joined the chat!!!');
       console.log(socket.id + ' is: ' + name);
    });
 
@@ -66,36 +66,88 @@ io.on('connection', (socket) => {
 
       msg = data.activePlayer.character + '(' + data.activePlayer.name + ') you are up!!';
       io.emit('chat message', msg);
+      io.emit('startOff');
 
       io.to(data.activePlayer.userID).emit('startTurn');
    });
 
-   // when someone submits action text
-   socket.on('action', (act) => {
-      let all = act.split(" ");
-      if (all.length > 1) {
-         act = all[0];
-      }
-
-      switch (act) {
-         case 'suggestion':
-            handleSuggestion(all);
-            break;
-         case 'accusation':
-            handleAccusation(all);
-            break;
-         case 'end':
-            handleEnd();
-            break;
-         default:
-            if (act == 'up' || act == 'down' || act == 'left' || act == 'right' || act == 'passage') {
-               handleMove(act);
-            }
-            else {
-               io.emit('chat message', 'Invalid entry!!!');
-            }
-      }
+   socket.on('showCard', (card) => {
+      io.to(data.activePlayer.userID).emit('seeCard', card);
       
+   });
+
+   socket.on('suggestion', (data) => {
+      handleSuggestion(data);
+   });
+
+   socket.on('goUp', () => {
+      handleMove('up');
+   });
+
+   //socket on for move down
+   socket.on('goDown', () => {
+      handleMove('down');
+   });
+
+   //socket on for move right
+   socket.on('goRight' , () => {
+      handleMove('right');
+   });
+
+   //socket on for move left
+   socket.on('goLeft', () => {
+      handleMove('left');
+   });
+
+   //socket on for passage move
+   socket.on('goPassage', () => {
+      handleMove('passage'); 
+   });
+
+   socket.on('makeAccusation', (data) => {
+      handleAccusation('accusation', data);
+   });
+
+   //socket on for suggestion
+   socket.on('makeSuggestion', (data) => {
+      handleSuggestion( data);
+   });
+
+   //socket on end turn
+   socket.on('endTurn', (data) => {
+      handleEnd();
+   });
+
+   // // when someone submits action text
+   // socket.on('action', (act) => {
+   //    let all = act.split(" ");
+   //    if (all.length > 1) {
+   //       act = all[0];
+   //    }
+
+   //    switch (act) {
+   //       case 'suggestion':
+   //          handleSuggestion(all);
+   //          break;
+   //       case 'accusation':
+   //          let msg = handleAccusation(all);
+   //          io.emit('chat message', msg)
+   //          break;
+   //       case 'end':
+   //          handleEnd();
+   //          break;
+   //       default:
+   //          if (act == 'up' || act == 'down' || act == 'left' || act == 'right' || act == 'passage') {
+   //             handleMove(act);
+   //          }
+   //          else {
+   //             io.emit('chat message', 'Invalid entry!!!');
+   //          }
+   //    }
+   //     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+   //    // $$$ end socket.on(action) $$$
+   //    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+   // });
 
       // $$$$$$$$$$$$$$$$$$$$$$$
       // $$$   functions     $$$
@@ -103,7 +155,6 @@ io.on('connection', (socket) => {
 
       function handleMove(act) {
          // Create message start
-         console.log("HEHRUEHRWEUF");
          let msg = data.activePlayer.character + '(' + data.activePlayer.name + ') moved from ';
 
          // Create descriptive message of first room for text based
@@ -147,19 +198,29 @@ io.on('connection', (socket) => {
          io.emit('chat message', msg);
       }
 
-      function handleSuggestion(sugArray) {
-         let suspect = accArray[1];
-         let weapon = accArray[2];
+      function handleSuggestion(sug) {
 
-         var suggestion = dr.makeSuggestion(data.activePlayer, suspect, weapon)
+         var suggestion = dr.makeSuggestion(data.activePlayer, sug.suspect, sug.weapon)
 
-         playerToPoke = dr.pollSuggestion(data.activePlayer, suggestion);
+         playerToPoke = dr.pollSuggestion(data.activePlayer, suggestion, data.players.length);
+         // io.emit('chat message', 'in suggestion');
+
+         if (playerToPoke == null) {
+            return 'Suggestion was not disproven'
+         }
 
          var opts = playerToPoke.checkPoll(suggestion);
+         
+         io.emit('chat message', 'ab 2 poke');
+         io.to(playerToPoke.userID).emit('chat message', 'im gonna poke you');
 
-         io.to(playerToPoke.userID).emit('poke', opts);
+         socket.to(playerToPoke.userID).emit('poke', opts);
+
+         
 
          data.activePlayer.hasSuggested = true;
+
+         return  playerToPoke.name + ' showed a card'
       }
 
       function handleAccusation(accArray) {
@@ -172,10 +233,8 @@ io.on('connection', (socket) => {
 
       }
 
-      // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-      // $$$ end socket.on(action) $$$
-      // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-   });
+     
+   
 
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$

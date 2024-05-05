@@ -91,9 +91,9 @@ class Player {
       checkPoll(suggestion) {
          let matches = [];
          
-         for (let ic = 0; ic < length(this.cardList); ic++) {
-            for (let is = 0; is < length(suggestion); is++) {
-               if (this.cardList[ic].name === suggestion[is]) {
+         for (let ic = 0; ic < this.cardList.length; ic++) {
+            for (const [key, value] of Object.entries(suggestion)) {
+               if (this.cardList[ic].name === value) {
                   matches.push(this.cardList[ic]);
                }
             }

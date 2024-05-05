@@ -93,12 +93,12 @@ function ResetDeck () {
 
 module.exports = {
     Card,
-    character_cards,
-    weapon_cards,
-    room_cards,
-    selectRandomCard,
-    WinningHand,
-    ShuffleDeck,
-    DealCards,
-    ResetDeck,
+   //  character_cards,
+   //  weapon_cards,
+   //  room_cards,
+   //  selectRandomCard,
+   //  WinningHand,
+   //  ShuffleDeck,
+   //  DealCards,
+   //  ResetDeck,
 };
